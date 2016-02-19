@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <canvas width="1000" height="500"></canvas>
+    </body>
+    <script>
+        var canvas = document.querySelector('canvas'),
+        ctx = canvas.getContext('2d');
+
+        /*
+        * 二次贝塞尔曲线
+        * @param {Array} a 起始点
+        * @param {Array} b 控制点
+        * @param {Array} c 结束点
+        */
+        
+        function quadraticCurveTo(a, b, c) {
+            var x, y,
+                t = 0,
+                dt = 1 / Math.abs(a[0] - c[0]),
+                dots = [];
+            /*两动点*/
+            var da = [], db = [];
+            dynamic();
+            function draw() {
+                ctx.fillStyle = 'green';
+                ctx.strokeStyle = 'green';
+                ctx.fillRect(a[0], a[1], 6, 6);
+                ctx.fillRect(b[0], b[1], 6, 6);
+                ctx.fillRect(c[0], c[1], 6, 6);
+                ctx.beginPath();
+                ctx.moveTo(a[0]+3, a[1]+3);
+                ctx.lineTo(b[0]+3, b[1]+3);
+                ctx.lineTo(c[0]+3, c[1]+3);
+                ctx.stroke();
+            }
+            function dynamic() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                draw();
+                x = Math.pow(1 - t, 2) * (a[0] + 3) + 2 * t * (1 - t) * (b[0] + 3) +
+                    Math.pow(t, 2) * (c[0] + 3);
+                y = Math.pow(1 - t, 2) * (a[1] + 3) + 2 * t * (1 - t) * (b[1] + 3) +
+                    Math.pow(t, 2) * (c[1] + 3);
+        
+                dots.push([x, y]);
+                ctx.beginPath();
+                ctx.moveTo(a[0], a[1]);
+                dots.forEach(function(e, i, arr) {
+                    ctx.lineTo(e[0], e[1]);
+                });
+                ctx.strokeStyle = 'green';
+                ctx.stroke();
+                da[0] = a[0] + 3 + t * (b[0] - a[0]);
+                da[1] = a[1] + 3 + t * (b[1] - a[1]);
+                db[0] = b[0] + 3 + t * (c[0] - b[0]);
+                db[1] = b[1] + 3 + t * (c[1] - b[1]);
+                ctx.beginPath();
+                ctx.moveTo(da[0], da[1]);
+                ctx.lineTo(db[0], db[1]);
+                ctx.strokeStyle = 'red';
+                ctx.stroke();
+                t += dt;
+                if (t > 1) {
+                    end();
+                    return;
+                }
+                requestAnimationFrame(function() {
+                    dynamic(a, b, c);
+                });
+            }
+            function end() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                draw();
+                ctx.beginPath();
+                ctx.moveTo(a[0], a[1]);
+                dots.forEach(function(e, i, arr) {
+                    ctx.lineTo(e[0], e[1]);
+                });
+                ctx.strokeStyle = 'green';
+                ctx.stroke();
+            }
+        }
+        quadraticCurveTo([0, 300], [190, 90], [380, 380]);
+    </script>
+</html>
